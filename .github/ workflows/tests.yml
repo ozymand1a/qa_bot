@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [ "main" , "add_cicd_pipeline"]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
