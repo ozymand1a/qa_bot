@@ -10,3 +10,6 @@ pep8-naming==0.13.3
 flake8-commas==2.1.0
 flake8-variables-names==0.0.5
 flake8-import-order==0.18.2
+
+#tests
+pytest==7.3.0
