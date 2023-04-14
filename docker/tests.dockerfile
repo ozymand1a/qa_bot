@@ -8,6 +8,6 @@ RUN pip install -U pip && pip install -U setuptools && pip install -r requiremen
 
 COPY . /qa_bot
 
-ENTRYPOINT ["pytest", "mypy"]
+ENTRYPOINT ["pytest"]
 RUN mypy .
 RUN flake8 .
