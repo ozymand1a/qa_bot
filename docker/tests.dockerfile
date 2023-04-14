@@ -1,4 +1,5 @@
 FROM python:3.10-slim
+ENV PYTHONUNBUFFERED=1
 
 RUN mkdir /qa_bot
 WORKDIR /qa_bot
@@ -8,4 +9,4 @@ RUN pip install -U pip && pip install -U setuptools && pip install -r requiremen
 
 COPY . /qa_bot
 
-ENTRYPOINT ["pytest && mypy && flake8"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
