@@ -8,5 +8,4 @@ RUN pip install -U pip && pip install -U setuptools && pip install -r requiremen
 
 COPY . /qa_bot
 
-ENTRYPOINT ["pytest"]
-CMD ["flake-8", "mypy"]
+ENTRYPOINT ["pytest", "flake8", "mypy"]
