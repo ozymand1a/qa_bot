@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "qa-bot"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "qa_bot"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+transformers = "^4.28.1"
+fastapi = "^0.95.1"
+langchain = "^0.0.161"
+pydantic = "^1.10.7"
+torch = "^2.0.0"
+uvicorn = "^0.22.0"
+sentencepiece = "^0.1.99"
+pandas = "^2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.23.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
