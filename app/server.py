@@ -2,10 +2,10 @@ from pathlib import Path
 
 import torch
 from fastapi import FastAPI
-from pydantic import BaseModel
-
 from model import get_model, get_response
+from pydantic import BaseModel
 from utils import get_data_path, get_logger
+
 from data import get_context, get_formatter
 
 # todo: Ability to change a database to query from
@@ -53,6 +53,11 @@ class QAService:
         pass
 
 
+class SimilaritySearch:
+    def find_similar_k(self, k: int = 3):
+        pass
+
+
 app = FastAPI()
 
 logger = get_logger(__name__)
@@ -74,3 +79,9 @@ async def query(question: Question):
     logger.info(f"received a request with question: {question.question}")
     answer = service.process_question(question)
     return {"answer": answer}
+
+
+@app.get("/saerch")
+async def search(question: Question):
+    """Find similar documents for the question"""
+    logger.info("received a request to find similar docs")
