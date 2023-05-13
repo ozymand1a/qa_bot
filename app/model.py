@@ -7,10 +7,12 @@ from utils import get_logger
 logger = get_logger(__name__)
 
 
+
 def get_model():
     """Returns StableLM model and tokenizer"""
     logger.warning("Using a model StableLM of size 26GB!")
-    model_id = "thebloke/stable-vicuna-13B-HF"
+    # model_id = "thebloke/stable-vicuna-13B-HF"
+    model_id = "thebloke/wizard-vicuna-13B-HF"
     tokenizer = LlamaTokenizer.from_pretrained(model_id)
     model = AutoModelForCausalLM.from_pretrained(
         model_id
