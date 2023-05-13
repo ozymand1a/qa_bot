@@ -16,6 +16,7 @@ torch = "^2.0.0"
 uvicorn = "^0.22.0"
 sentencepiece = "^0.1.99"
 pandas = "^2.0.1"
+fire = "^0.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
