@@ -4,13 +4,31 @@ from pprint import pprint
 import json
 
 
-def run(question: str = "What is the capital of France?", port: int = 8000):
-    url = f"http://0.0.0.0:{port}/answer"
+ADDRESS = "http://0.0.0.0"
+
+
+def get_rel_docs(question: str, port: int = 8000, address: str = ADDRESS):
+    url = f"{address}:{port}/search"
     data = {"question": question}
 
     response = requests.get(url, json=data)
-    print(response.json()["answer"])  # json.dumps(, indent=4))
+    return response.json()["relevant_documents"]
+
+
+def ask_question(
+    question: str,
+    llm_port: int = 8000,
+    docs_search_port: int = 8001,
+    address: str = ADDRESS,
+):
+    rel_docs = get_rel_docs(question, docs_search_port, address)
+
+    # make request with context
+    url = f"{address}:{llm_port}/api_v1/ask"
+    data = {"question": question, "context": rel_docs}
+    response = requests.get(url, json=data)
+    print(response.json()["answer"])
 
 
 if __name__ == "__main__":
-    Fire(run)
+    Fire()
