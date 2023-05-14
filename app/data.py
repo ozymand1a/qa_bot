@@ -1,10 +1,13 @@
 from langchain.prompts import PromptTemplate
 from pydantic import validate_arguments, FilePath
 
-from telegram_loader import TelegramChatLoader 
+from telegram_loader import TelegramChatLoader
 from utils import get_logger
 
 logger = get_logger(__file__)
+
+
+# __all__ = ["get_formatter", "get_context"]
 
 
 def get_formatter():
@@ -13,7 +16,7 @@ def get_formatter():
     """
     prompt_temp = PromptTemplate(
         input_variables=["context", "question"],
-        template="### Context:\n{context}\n\n### Human: {question}\n\n### Assistant:"
+        template="### Context:\n{context}\n\n### Human: which message is the most related to this '{question}'\n\n### Assistant:",  # using only data from context
     )
     return prompt_temp
 
@@ -29,7 +32,10 @@ def get_documents(filepath: FilePath):
 
 
 def merge_docs(docs):
-    contents = (i.page_content for i in docs)
+    try:
+        contents = (i.page_content for i in docs)
+    except:
+        contents = (i["page_content"] for i in docs)
     merged = "\n\n".join(contents)
     return merged
 
