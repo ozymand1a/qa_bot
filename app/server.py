@@ -1,71 +1,51 @@
 from pathlib import Path
+from typing import List
 
 import torch
 from fastapi import FastAPI
 from model import get_model, get_response
 from pydantic import BaseModel
-from utils import get_data_path, get_logger
+from type_defs import Prompt, Question, QuestionNContext
+from utils import get_logger
 
-from data import get_context, get_formatter
+from data import get_context, get_formatter, merge_docs
 
-# todo: Ability to change a database to query from
-# todo: log to file !!!
-# todo: another endpoints for adding new messages(as text or as file)
-
-
-class Question(BaseModel):
-    question: str
+# todo: log into file !!!
 
 
 class QAService:
-    def __init__(
-        self,
-        model,
-        tokenizer,
-        device,
-        chat_path: Path = Path(__file__).parent.parent
-        / "data"
-        / "django_chat_history.json",
-    ):
-        self.chat_path = chat_path
+    def __init__(self, model, tokenizer, device):
         self.prompt_formatter = get_formatter()
         self.model = model
         self.tokenizer = tokenizer
         self.device = device
 
-    def question2prompt(self, question: Question) -> str:
-        context = get_context(question.question, self.chat_path)
-        prompt = self.prompt_formatter.format(context=context, question=question)
+    def _question2prompt(self, question: str, context: List) -> str:
+        merged_context = merge_docs(context)
+        prompt = self.prompt_formatter.format(context=merged_context, question=question)
         return prompt
 
-    def process_prompt(self, prompt: str):
+    def _process_prompt(self, prompt: str):
         response = get_response(prompt, self.model, self.tokenizer, self.device)
         torch.cuda.empty_cache()
-        return response
-
-    def process_question(self, question: Question) -> str:
-        """Method to define a business logic"""
-        prompt = self.question2prompt(question)
-        response = self.process_prompt(prompt)
         return response
 
     def _postprocess_answer(self):
         pass
 
-
-class SimilaritySearch:
-    def find_similar_k(self, k: int = 3):
-        pass
+    def process_question(self, question: str, context: List) -> str:
+        """Method to define a business logic"""
+        prompt = self._question2prompt(question, context)
+        response = self._process_prompt(prompt)
+        return response
 
 
 app = FastAPI()
 
 logger = get_logger(__name__)
 
-import torch
 
 DEVICE = torch.device("cuda:1")
-
 
 model, tokenizer = get_model()
 logger.warning("bad thing happened here")
@@ -73,15 +53,22 @@ model.to(DEVICE)  # todo: handle this
 service = QAService(model=model, tokenizer=tokenizer, device=DEVICE)
 
 
-@app.get("/answer")
-async def query(question: Question):
-    """Process question using LLM on the chat history"""
-    logger.info(f"received a request with question: {question.question}")
-    answer = service.process_question(question)
+class Metadata(BaseModel):
+    source: str
+
+
+class ContextModel(BaseModel):
+    metadata: Metadata
+    page_content: str
+
+
+class QuestionModel(BaseModel):
+    question: str
+    context: List[ContextModel]
+
+
+@app.get("/api_v1/ask")  # List[dict]  # question: Question,
+async def query_w_context(data: QuestionModel):
+    """Process prompt using LLM, prompt should have a context"""
+    answer = service.process_question(data.question, data.context)
     return {"answer": answer}
-
-
-@app.get("/saerch")
-async def search(question: Question):
-    """Find similar documents for the question"""
-    logger.info("received a request to find similar docs")
