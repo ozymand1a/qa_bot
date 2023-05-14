@@ -7,7 +7,6 @@ from utils import get_logger
 logger = get_logger(__name__)
 
 
-
 def get_model():
     """Returns StableLM model and tokenizer"""
     logger.warning("Using a model StableLM of size 26GB!")
